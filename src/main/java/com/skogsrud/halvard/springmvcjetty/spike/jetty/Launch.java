@@ -13,13 +13,13 @@ public class Launch {
     private static final int PORT = 8080;
     private final Server server;
 
+    public static void main(String[] args) throws Exception {
+        new Launch().start();
+    }
+
     public Launch() {
         server = new Server(PORT);
         server.setHandler(createApplicationContext());
-    }
-
-    public static void main(String[] args) throws Exception {
-        new Launch().start();
     }
 
     public void start() throws Exception {
