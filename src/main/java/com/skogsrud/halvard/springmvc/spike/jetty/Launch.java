@@ -1,4 +1,4 @@
-package com.skogsrud.halvard.springmvcjetty.spike.jetty;
+package com.skogsrud.halvard.springmvc.spike.jetty;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.server.Server;

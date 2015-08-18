@@ -62,7 +62,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.skogsrud.halvard.springmvcjetty.spike.jetty.Launch</mainClass>
+                            <mainClass>com.skogsrud.halvard.springmvc.spike.jetty.Launch</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -75,7 +75,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.skogsrud.halvard.springmvcjetty.spike.jetty.Launch</mainClass>
+                            <mainClass>com.skogsrud.halvard.springmvc.spike.jetty.Launch</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -1,4 +1,4 @@
-package com.skogsrud.halvard.springmvcjetty.spike.initializer;
+package com.skogsrud.halvard.springmvc.spike.initializer;
 
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -13,7 +13,7 @@ public class AppInitializer implements WebApplicationInitializer {
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-        context.setConfigLocation("com.skogsrud.halvard.springmvcjetty.spike.config");
+        context.setConfigLocation("com.skogsrud.halvard.springmvc.spike.config");
         servletContext.addListener(new ContextLoaderListener(context));
         ServletRegistration.Dynamic dispatcher = servletContext.addServlet("spring", new DispatcherServlet(context));
         dispatcher.setLoadOnStartup(1);

@@ -1,4 +1,4 @@
-package com.skogsrud.halvard.springmvcjetty.spike.config;
+package com.skogsrud.halvard.springmvc.spike.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;

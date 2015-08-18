@@ -1,9 +1,9 @@
-package com.skogsrud.halvard.springmvcjetty.spike.config;
+package com.skogsrud.halvard.springmvc.spike.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan(basePackages = "com.skogsrud.halvard.springmvcjetty.spike")
+@ComponentScan(basePackages = "com.skogsrud.halvard.springmvc.spike")
 public class AppConfig {
 }
