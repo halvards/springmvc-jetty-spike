@@ -8,17 +8,20 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
 
 public class Launch {
-    private static final int PORT = 8080;
+    private static final int DEFAULT_PORT = 8080;
     private final Server server;
 
     public static void main(String[] args) throws Exception {
         new Launch().start();
     }
 
-    public Launch() {
-        server = new Server(PORT);
+    public Launch() throws Exception {
+        int port = getPort();
+        server = new Server(port);
         server.setHandler(createApplicationContext());
     }
 
@@ -34,7 +37,7 @@ public class Launch {
     private WebAppContext createApplicationContext() {
         WebAppContext context = new WebAppContext();
         context.setResourceBase("src/main/webapp");
-          File mavenClassesDirectory = new File("target/classes");
+        File mavenClassesDirectory = new File("target/classes");
         if (mavenClassesDirectory.exists()) {
             // Running without a packaged JAR file
             context.getMetaData().addContainerResource(new PathResource(mavenClassesDirectory));
@@ -45,8 +48,24 @@ public class Launch {
         context.setConfigurations(new Configuration[]{
                 new AnnotationConfiguration(),
                 new WebInfConfiguration()});
-        context.setContextPath("/");
-        context.setParentLoaderPriority(true);
+        context.setContextPath("/app");
         return context;
+    }
+
+    private int getPort() throws IOException {
+        String portEnv = System.getenv("PORT");
+        if ("0".equals(portEnv)) {
+            return findRandomOpenPort();
+        }
+        if ((portEnv != null)) {
+            return Integer.parseInt(portEnv);
+        }
+        return DEFAULT_PORT;
+    }
+
+    private int findRandomOpenPort() throws IOException {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        }
     }
 }
