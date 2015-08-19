@@ -9,25 +9,37 @@ import org.eclipse.jetty.webapp.WebInfConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
 
-public class Launch {
+public class Main {
     private static final int DEFAULT_PORT = 8080;
     private final Server server;
 
     public static void main(String[] args) throws Exception {
-        new Launch().start();
+        new Main().run();
     }
 
-    public Launch() throws Exception {
-        int port = getPort();
+    public Main() throws Exception {
+        this(getPort());
+    }
+
+    public Main(int port) throws Exception {
         server = new Server(port);
         server.setHandler(createApplicationContext());
     }
 
-    public void start() throws Exception {
+    /**
+     * Start server and block, waiting for it to stop.
+     */
+    public void run() throws Exception {
         server.start();
         server.join();
+    }
+
+    /**
+     * Start server and return when server has started.
+     */
+    public void start() throws Exception {
+        server.start();
     }
 
     public void stop() throws Exception {
@@ -52,20 +64,7 @@ public class Launch {
         return context;
     }
 
-    private int getPort() throws IOException {
-        String portEnv = System.getenv("PORT");
-        if ("0".equals(portEnv)) {
-            return findRandomOpenPort();
-        }
-        if ((portEnv != null)) {
-            return Integer.parseInt(portEnv);
-        }
-        return DEFAULT_PORT;
-    }
-
-    private int findRandomOpenPort() throws IOException {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        }
+    private static int getPort() throws IOException {
+        return System.getenv("PORT") == null ? DEFAULT_PORT : Integer.parseInt(System.getenv("PORT"));
     }
 }
