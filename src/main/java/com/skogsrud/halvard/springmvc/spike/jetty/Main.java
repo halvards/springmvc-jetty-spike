@@ -11,15 +11,16 @@ import java.io.File;
 import java.io.IOException;
 
 public class Main {
-    private static final int DEFAULT_PORT = 8080;
+    static final int DEFAULT_PORT = 8081;
+
     private final Server server;
 
     public static void main(String[] args) throws Exception {
-        new Main().run();
+        new Main(new Environment()).run();
     }
 
-    public Main() throws Exception {
-        this(getPort());
+    private Main(Environment environment) throws Exception {
+        this(getPort(environment));
     }
 
     public Main(int port) throws Exception {
@@ -49,9 +50,13 @@ public class Main {
     private WebAppContext createApplicationContext() {
         WebAppContext context = new WebAppContext();
         context.setResourceBase("src/main/webapp");
+        File gradleClassesDirectory = new File("build/classes");
         File mavenClassesDirectory = new File("target/classes");
-        if (mavenClassesDirectory.exists()) {
-            // Running without a packaged JAR file
+        if (gradleClassesDirectory.exists()) {
+            // Running without a packaged JAR file, using Gradle
+            context.getMetaData().addContainerResource(new PathResource(gradleClassesDirectory));
+        } else if (mavenClassesDirectory.exists()) {
+            // Running without a packaged JAR file, using Maven
             context.getMetaData().addContainerResource(new PathResource(mavenClassesDirectory));
         } else {
             // Running as JAR file
@@ -64,7 +69,7 @@ public class Main {
         return context;
     }
 
-    private static int getPort() throws IOException {
-        return System.getenv("PORT") == null ? DEFAULT_PORT : Integer.parseInt(System.getenv("PORT"));
+    static int getPort(Environment environment) throws IOException {
+        return environment.getVariable("PORT") == null ? DEFAULT_PORT : Integer.parseInt(environment.getVariable("PORT"));
     }
 }

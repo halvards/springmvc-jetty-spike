@@ -1,11 +1,9 @@
+plugins {
+    id 'org.unbroken-dome.test-sets' version '1.2.0'
+}
+
 apply plugin: 'application'     // http://www.gradle.org/docs/current/userguide/application_plugin.html
-//apply plugin: 'eclipse'         // http://www.gradle.org/docs/current/userguide/eclipse_plugin.html
-//apply plugin: 'idea'            // http://www.gradle.org/docs/current/userguide/idea_plugin.html
 apply plugin: 'java'            // http://www.gradle.org/docs/current/userguide/java_plugin.html
-//apply plugin: 'maven'           // https://docs.gradle.org/current/userguide/maven_plugin.html
-//apply plugin: 'maven-publish'   // http://www.gradle.org/docs/current/userguide/publishing_maven.html
-// Use the war plugin to create an executable WAR file instead of a JAR file
-//apply plugin: 'war'             // http://www.gradle.org/docs/current/userguide/war_plugin.html
 
 def javaVersion = '1.8'
 sourceCompatibility = javaVersion
@@ -15,7 +13,7 @@ def springLoadedVersion = '1.2.4.RELEASE'
 mainClassName = 'com.skogsrud.halvard.springmvc.spike.jetty.Main'
 applicationDefaultJvmArgs = ["-javaagent:agents/springloaded-${springLoadedVersion}.jar", '-noverify']
 
-def buildLabel = "${new Date().format("yyyyMMddHHmmss")}.${System.env.USER}"
+def buildLabel = "${System.env.USER}.${new Date().format("yyyyMMddHHmmss")}"
 def travisBuildLabel = System.env.TRAVIS_BUILD_NUMBER
 if (travisBuildLabel) {
     buildLabel = travisBuildLabel
@@ -31,33 +29,25 @@ jar {
 }
 
 configurations {
-    integrationTestCompile { extendsFrom testCompile }
-    integrationTestRuntime { extendsFrom integrationTestCompile, testRuntime }
+    all*.exclude group: 'commons-logging'  // Never include commons-logging (use SLF4J instead)
+    all*.exclude group: 'log4j'            // Never include log4j (use SLF4J instead)
+
+    springloaded
+    newrelic
 }
 
-sourceSets {
-    integrationTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file('src/integration-test/java')
-        }
-        resources.srcDir file('src/integration-test/resources')
-    }
+testSets {
+    integrationTest { dirName = 'integration-test' }
 }
 
-task integrationTest(type: Test,
-                     dependsOn: [testClasses],
-                     description: 'Runs the integration tests.',
-                     group: 'verification') {
-    testClassesDir = sourceSets.integrationTest.output.classesDir
-    classpath = sourceSets.integrationTest.runtimeClasspath
-    outputs.upToDateWhen { false }
-}
+tasks.integrationTest.group = 'Verification'
+tasks.integrationTest.description = 'Runs the integration tests.'
+//tasks.integrationTest.outputs.upToDateWhen { false }  // Run all integration tests every time, even if no changes have been made
 
-check.dependsOn integrationTest
-integrationTest.shouldRunAfter test
+check.dependsOn integrationTest      // The check task fails the build if there are failing integration tests
+integrationTest.shouldRunAfter test  // Run unit tests before integration tests
 
+// Ensure that the HTML reports of unit and integration tests are written to different directories
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
 }
@@ -72,6 +62,8 @@ def jettyVersion = '9.3.5.v20151012'
 def slf4jVersion = '1.7.12'
 def commonsLang3Version = '3.4'
 def commonsIoVersion = '2.4'
+def commonsCodecVersion = '1.9'
+def commonsCollections4Version = '4.0'
 def okhttpVersion = '2.5.0'
 def jacksonVersion = '2.6.3'
 def springWsVersion = '2.2.3.RELEASE'
@@ -83,20 +75,24 @@ def hamcrestVersion = '1.3'
 def mockitoVersion = '2.0.31-beta'
 def mockwebserverVersion = '2.5.0'
 
+def newRelicAgentVersion = '3.19.2'
+
 dependencies {
     compile "org.springframework:spring-webmvc:${springVersion}",
             "org.eclipse.jetty:jetty-annotations:${jettyVersion}",
             "org.slf4j:slf4j-api:${slf4jVersion}",
+            "org.slf4j:jcl-over-slf4j:${slf4jVersion}",
+            "org.slf4j:log4j-over-slf4j:${slf4jVersion}",
             "org.slf4j:slf4j-simple:${slf4jVersion}",
             "org.apache.commons:commons-lang3:${commonsLang3Version}",
             "commons-io:commons-io:${commonsIoVersion}",
+            "commons-codec:commons-codec:${commonsCodecVersion}",
+            "org.apache.commons:commons-collections4:${commonsCollections4Version}",
             "com.squareup.okhttp:okhttp:${okhttpVersion}",
             "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
             "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
             "org.springframework.ws:spring-ws-core:${springWsVersion}",
-            "org.springframework.ws:spring-xml:${springWsVersion}",
-            "org.springframework.security:spring-security-web:${springSecurityVersion}",
-            "org.apache.httpcomponents:httpclient:${httpclientVersion}"
+            "org.springframework.security:spring-security-web:${springSecurityVersion}"
 
     testCompile "junit:junit:${junitVersion}",
             "org.hamcrest:hamcrest-library:${hamcrestVersion}",
@@ -105,9 +101,15 @@ dependencies {
             "com.squareup.okhttp:mockwebserver:${mockwebserverVersion}"
 
     integrationTestCompile "org.springframework.ws:spring-ws-test:${springWsVersion}"
+
+    springloaded "org.springframework:springloaded:${springLoadedVersion}"
+
+    newrelic "com.newrelic.agent.java:newrelic-agent:${newRelicAgentVersion}"
 }
 
-task onejar(type: Jar) {
+task onejar(type: Jar,
+        description: 'Create all-in-one executable JAR file.',
+        group: 'Distribution') {
     manifest {
         attributes 'Main-Class': mainClassName
     }
@@ -116,6 +118,36 @@ task onejar(type: Jar) {
     with jar
 }
 
-task wrapper(type: Wrapper) {
+task copySpringLoaded(type: Copy,
+        description: 'Make Spring Loaded available for IDE and CLI use.',
+        group: 'Build Setup') {
+    from {
+        configurations.springloaded
+    }
+    into "agents/"
+}
+run.dependsOn copySpringLoaded
+
+task copyNewRelic(type: Copy,
+        description: 'Make NewRelic available for Heroku.',
+        group: 'Build Setup') {
+    from {
+        configurations.newrelic
+    }
+    into "agents/"
+    rename "newrelic-agent-${newRelicAgentVersion}.jar", 'newrelic-agent.jar'
+}
+copyNewRelic.shouldRunAfter clean
+
+assemble.shouldRunAfter clean
+assemble.shouldRunAfter copyNewRelic
+task stage(dependsOn: ['clean', 'copyNewRelic', 'assemble'],
+        description: 'Heroku uses this task to build the app.',
+        group: 'Build')
+
+
+task wrapper(type: Wrapper,
+        description: 'Create Gradle wrapper scripts.',
+        group: 'Build Setup') {
     gradleVersion = '2.8'
 }
