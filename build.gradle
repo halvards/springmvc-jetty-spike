@@ -1,8 +1,9 @@
 apply plugin: 'application'     // http://www.gradle.org/docs/current/userguide/application_plugin.html
-apply plugin: 'eclipse'         // http://www.gradle.org/docs/current/userguide/eclipse_plugin.html
-apply plugin: 'idea'            // http://www.gradle.org/docs/current/userguide/idea_plugin.html
+//apply plugin: 'eclipse'         // http://www.gradle.org/docs/current/userguide/eclipse_plugin.html
+//apply plugin: 'idea'            // http://www.gradle.org/docs/current/userguide/idea_plugin.html
 apply plugin: 'java'            // http://www.gradle.org/docs/current/userguide/java_plugin.html
-apply plugin: 'maven-publish'   // http://www.gradle.org/docs/current/userguide/publishing_maven.html
+//apply plugin: 'maven'           // https://docs.gradle.org/current/userguide/maven_plugin.html
+//apply plugin: 'maven-publish'   // http://www.gradle.org/docs/current/userguide/publishing_maven.html
 // Use the war plugin to create an executable WAR file instead of a JAR file
 //apply plugin: 'war'             // http://www.gradle.org/docs/current/userguide/war_plugin.html
 
@@ -11,14 +12,17 @@ sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
 
 def springLoadedVersion = '1.2.4.RELEASE'
-mainClassName = 'com.skogsrud.halvard.springmvc.spike.tomcat.Server'
+mainClassName = 'com.skogsrud.halvard.springmvc.spike.jetty.Main'
 applicationDefaultJvmArgs = ["-javaagent:agents/springloaded-${springLoadedVersion}.jar", '-noverify']
 
-def buildLabel = "${System.env.USER}.${new Date().format("yyyyMMddHHmmss")}"
+def buildLabel = "${new Date().format("yyyyMMddHHmmss")}.${System.env.USER}"
 def travisBuildLabel = System.env.TRAVIS_BUILD_NUMBER
 if (travisBuildLabel) {
     buildLabel = travisBuildLabel
 }
+
+group = 'com.skogsrud.halvard'
+version = buildLabel
 
 jar {
     manifest {
@@ -85,11 +89,11 @@ dependencies {
             "org.slf4j:slf4j-api:${slf4jVersion}",
             "org.slf4j:slf4j-simple:${slf4jVersion}",
             "org.apache.commons:commons-lang3:${commonsLang3Version}",
-            "commons-io:commons-io:{commonsIoVersion}",
+            "commons-io:commons-io:${commonsIoVersion}",
             "com.squareup.okhttp:okhttp:${okhttpVersion}",
             "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
             "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
-            "org.springframework.ws:spring-core:${springWsVersion}",
+            "org.springframework.ws:spring-ws-core:${springWsVersion}",
             "org.springframework.ws:spring-xml:${springWsVersion}",
             "org.springframework.security:spring-security-web:${springSecurityVersion}",
             "org.apache.httpcomponents:httpclient:${httpclientVersion}"
