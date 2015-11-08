@@ -1,0 +1,117 @@
+apply plugin: 'application'     // http://www.gradle.org/docs/current/userguide/application_plugin.html
+apply plugin: 'eclipse'         // http://www.gradle.org/docs/current/userguide/eclipse_plugin.html
+apply plugin: 'idea'            // http://www.gradle.org/docs/current/userguide/idea_plugin.html
+apply plugin: 'java'            // http://www.gradle.org/docs/current/userguide/java_plugin.html
+apply plugin: 'maven-publish'   // http://www.gradle.org/docs/current/userguide/publishing_maven.html
+// Use the war plugin to create an executable WAR file instead of a JAR file
+//apply plugin: 'war'             // http://www.gradle.org/docs/current/userguide/war_plugin.html
+
+def javaVersion = '1.8'
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+def springLoadedVersion = '1.2.4.RELEASE'
+mainClassName = 'com.skogsrud.halvard.springmvc.spike.tomcat.Server'
+applicationDefaultJvmArgs = ["-javaagent:agents/springloaded-${springLoadedVersion}.jar", '-noverify']
+
+def buildLabel = "${System.env.USER}.${new Date().format("yyyyMMddHHmmss")}"
+def travisBuildLabel = System.env.TRAVIS_BUILD_NUMBER
+if (travisBuildLabel) {
+    buildLabel = travisBuildLabel
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
+
+configurations {
+    integrationTestCompile { extendsFrom testCompile }
+    integrationTestRuntime { extendsFrom integrationTestCompile, testRuntime }
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
+}
+
+task integrationTest(type: Test,
+                     dependsOn: [testClasses],
+                     description: 'Runs the integration tests.',
+                     group: 'verification') {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+}
+
+check.dependsOn integrationTest
+integrationTest.shouldRunAfter test
+
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
+}
+
+repositories {
+    mavenCentral()
+    //mavenLocal()   // use mavenLocal() to pick up dependencies from your local Maven repository (~/.m2/repository)
+}
+
+def springVersion = '4.2.2.RELEASE'
+def jettyVersion = '9.3.5.v20151012'
+def slf4jVersion = '1.7.12'
+def commonsLang3Version = '3.4'
+def commonsIoVersion = '2.4'
+def okhttpVersion = '2.5.0'
+def jacksonVersion = '2.6.3'
+def springWsVersion = '2.2.3.RELEASE'
+def springSecurityVersion = '4.0.3.RELEASE'
+def httpclientVersion = '4.5.1'
+
+def junitVersion = '4.12'
+def hamcrestVersion = '1.3'
+def mockitoVersion = '2.0.31-beta'
+def mockwebserverVersion = '2.5.0'
+
+dependencies {
+    compile "org.springframework:spring-webmvc:${springVersion}",
+            "org.eclipse.jetty:jetty-annotations:${jettyVersion}",
+            "org.slf4j:slf4j-api:${slf4jVersion}",
+            "org.slf4j:slf4j-simple:${slf4jVersion}",
+            "org.apache.commons:commons-lang3:${commonsLang3Version}",
+            "commons-io:commons-io:{commonsIoVersion}",
+            "com.squareup.okhttp:okhttp:${okhttpVersion}",
+            "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
+            "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
+            "org.springframework.ws:spring-core:${springWsVersion}",
+            "org.springframework.ws:spring-xml:${springWsVersion}",
+            "org.springframework.security:spring-security-web:${springSecurityVersion}",
+            "org.apache.httpcomponents:httpclient:${httpclientVersion}"
+
+    testCompile "junit:junit:${junitVersion}",
+            "org.hamcrest:hamcrest-library:${hamcrestVersion}",
+            "org.mockito:mockito-core:${mockitoVersion}",
+            "org.springframework:spring-test:${springVersion}",
+            "com.squareup.okhttp:mockwebserver:${mockwebserverVersion}"
+
+    integrationTestCompile "org.springframework.ws:spring-ws-test:${springWsVersion}"
+}
+
+task onejar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.8'
+}
