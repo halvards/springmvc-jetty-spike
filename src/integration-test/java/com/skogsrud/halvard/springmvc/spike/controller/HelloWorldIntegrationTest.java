@@ -1,10 +1,9 @@
 package com.skogsrud.halvard.springmvc.spike.controller;
 
-import com.skogsrud.halvard.springmvc.spike.jetty.Main;
+import com.skogsrud.halvard.springmvc.spike.Application;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -14,22 +13,16 @@ import java.net.ServerSocket;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class HelloWorldControllerTest {
-    private static Main server;
+public class HelloWorldIntegrationTest {
     private static int port;
     private static OkHttpClient client;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
         port = findRandomOpenPort();
-        server = new Main(port);
-        server.start();
+        System.setProperty("server.port", String.valueOf(port));
+        Application.main();
         client = new OkHttpClient();
-    }
-
-    @AfterClass
-    public static void afterClass() throws Exception {
-        server.stop();
     }
 
     @Test

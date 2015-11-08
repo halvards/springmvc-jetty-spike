@@ -1,16 +1,26 @@
-plugins {
-    id 'org.unbroken-dome.test-sets' version '1.2.0'
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url 'http://repo.spring.io/libs-snapshot' }
+    }
+    dependencies {
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.3.0.RC1'
+        classpath 'org.unbroken-dome.gradle-plugins:gradle-testsets-plugin:1.2.0'
+    }
 }
 
-apply plugin: 'application'     // http://www.gradle.org/docs/current/userguide/application_plugin.html
-apply plugin: 'java'            // http://www.gradle.org/docs/current/userguide/java_plugin.html
+apply plugin: 'application'                  // http://www.gradle.org/docs/current/userguide/application_plugin.html
+apply plugin: 'java'                         // http://www.gradle.org/docs/current/userguide/java_plugin.html
+apply plugin: 'org.unbroken-dome.test-sets'  // https://github.com/unbroken-dome/gradle-testsets-plugin
+apply plugin: 'spring-boot'                  // http://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-gradle-plugin.html
 
 def javaVersion = '1.8'
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
 
 def springLoadedVersion = '1.2.4.RELEASE'
-mainClassName = 'com.skogsrud.halvard.springmvc.spike.jetty.Main'
+mainClassName = 'com.skogsrud.halvard.springmvc.spike.Application'
 applicationDefaultJvmArgs = ["-javaagent:agents/springloaded-${springLoadedVersion}.jar", '-noverify']
 
 def buildLabel = "${System.env.USER}.${new Date().format("yyyyMMddHHmmss")}"
@@ -29,8 +39,11 @@ jar {
 }
 
 configurations {
-    all*.exclude group: 'commons-logging'  // Never include commons-logging (use SLF4J instead)
-    all*.exclude group: 'log4j'            // Never include log4j (use SLF4J instead)
+    all*.exclude group: 'commons-logging'              // Never include commons-logging (use SLF4J instead)
+    all*.exclude group: 'log4j'                        // Never include log4j (use SLF4J instead)
+    all*.exclude module: 'spring-boot-starter-tomcat'  // Never include Tomcat (use Jetty instead)
+    all*.exclude module: 'jetty-jsp'                   // No need for JSP support
+    all*.exclude module: 'slf4j-simple'                // Use logback
 
     springloaded
     newrelic
@@ -54,45 +67,54 @@ tasks.withType(Test) {
 
 repositories {
     mavenCentral()
-    //mavenLocal()   // use mavenLocal() to pick up dependencies from your local Maven repository (~/.m2/repository)
+    maven { url 'http://repo.spring.io/libs-snapshot' }
 }
 
-def springVersion = '4.2.2.RELEASE'
-def jettyVersion = '9.3.5.v20151012'
-def slf4jVersion = '1.7.12'
-def commonsLang3Version = '3.4'
-def commonsIoVersion = '2.4'
 def commonsCodecVersion = '1.9'
 def commonsCollections4Version = '4.0'
-def okhttpVersion = '2.5.0'
-def jacksonVersion = '2.6.3'
-def springWsVersion = '2.2.3.RELEASE'
-def springSecurityVersion = '4.0.3.RELEASE'
-def httpclientVersion = '4.5.1'
-
-def junitVersion = '4.12'
+def commonsIoVersion = '2.4'
+def commonsLang3Version = '3.4'
 def hamcrestVersion = '1.3'
+def hibernateValidatorVersion = '5.2.2.Final'
+def jacksonVersion = '2.6.3'
+def jettyVersion = '9.3.5.v20151012'
+def jmustacheVersion = '1.11'
+def junitVersion = '4.12'
+def logbackVersion = '1.1.3'
+def metricsVersion = '3.0.2'
 def mockitoVersion = '2.0.31-beta'
 def mockwebserverVersion = '2.5.0'
-
 def newRelicAgentVersion = '3.19.2'
+def okhttpVersion = '2.5.0'
+def slf4jVersion = '1.7.12'
+def snakeyamlVersion = '1.16'
+def springBootVersion = '1.3.0.RC1'
+def springSecurityVersion = '4.0.3.RELEASE'
+def springVersion = '4.2.2.RELEASE'
+def springWsVersion = '2.2.3.RELEASE'
 
 dependencies {
-    compile "org.springframework:spring-webmvc:${springVersion}",
-            "org.eclipse.jetty:jetty-annotations:${jettyVersion}",
+    compile "org.springframework.boot:spring-boot-actuator:${springBootVersion}",
+            "org.eclipse.jetty:jetty-webapp:${jettyVersion}",
             "org.slf4j:slf4j-api:${slf4jVersion}",
             "org.slf4j:jcl-over-slf4j:${slf4jVersion}",
             "org.slf4j:log4j-over-slf4j:${slf4jVersion}",
-            "org.slf4j:slf4j-simple:${slf4jVersion}",
+            "ch.qos.logback:logback-classic:${logbackVersion}",
+            "org.yaml:snakeyaml:${snakeyamlVersion}",
+            "org.hibernate:hibernate-validator:${hibernateValidatorVersion}",
+            "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
+            "org.springframework:spring-webmvc:${springVersion}",
+            "com.codahale.metrics:metrics-jetty9:${metricsVersion}",
+            "com.codahale.metrics:metrics-servlet:${metricsVersion}",
+            "com.codahale.metrics:metrics-servlets:${metricsVersion}",
+            "org.springframework.security:spring-security-web:${springSecurityVersion}",
             "org.apache.commons:commons-lang3:${commonsLang3Version}",
             "commons-io:commons-io:${commonsIoVersion}",
             "commons-codec:commons-codec:${commonsCodecVersion}",
             "org.apache.commons:commons-collections4:${commonsCollections4Version}",
             "com.squareup.okhttp:okhttp:${okhttpVersion}",
-            "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
-            "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
             "org.springframework.ws:spring-ws-core:${springWsVersion}",
-            "org.springframework.security:spring-security-web:${springSecurityVersion}"
+            "com.samskivert:jmustache:${jmustacheVersion}"
 
     testCompile "junit:junit:${junitVersion}",
             "org.hamcrest:hamcrest-library:${hamcrestVersion}",
