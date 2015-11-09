@@ -6,10 +6,11 @@ management:
   contextPath: /admin
   port: ${port:8081}
 
-# Default Spring profile
 spring:
   profiles:
-    active: dev
+    active: dev # Default Spring profile
+  mustache:
+    suffix: .mustache
 
 # Set default password for management URLs. Not used as it's overridden by Spring Security configuration.
 security:
