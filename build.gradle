@@ -75,51 +75,37 @@ def commonsCollections4Version = '4.0'
 def commonsIoVersion = '2.4'
 def commonsLang3Version = '3.4'
 def hamcrestVersion = '1.3'
-def hibernateValidatorVersion = '5.2.2.Final'
-def jacksonVersion = '2.6.3'
 def jettyVersion = '9.3.5.v20151012'
 def jmustacheVersion = '1.11'
 def junitVersion = '4.12'
-def logbackVersion = '1.1.3'
 def metricsVersion = '3.0.2'
 def mockitoVersion = '2.0.31-beta'
 def mockwebserverVersion = '2.5.0'
 def newRelicAgentVersion = '3.19.2'
 def okhttpVersion = '2.5.0'
-def slf4jVersion = '1.7.12'
-def snakeyamlVersion = '1.16'
 def springBootVersion = '1.3.0.RC1'
-def springSecurityVersion = '4.0.3.RELEASE'
-def springVersion = '4.2.2.RELEASE'
 def springWsVersion = '2.2.3.RELEASE'
 
 dependencies {
-    compile "org.springframework.boot:spring-boot-actuator:${springBootVersion}",
+    compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
             "org.eclipse.jetty:jetty-webapp:${jettyVersion}",
-            "org.slf4j:slf4j-api:${slf4jVersion}",
-            "org.slf4j:jcl-over-slf4j:${slf4jVersion}",
-            "org.slf4j:log4j-over-slf4j:${slf4jVersion}",
-            "ch.qos.logback:logback-classic:${logbackVersion}",
-            "org.yaml:snakeyaml:${snakeyamlVersion}",
-            "org.hibernate:hibernate-validator:${hibernateValidatorVersion}",
-            "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}",
-            "org.springframework:spring-webmvc:${springVersion}",
-            "com.codahale.metrics:metrics-jetty9:${metricsVersion}",
-            "com.codahale.metrics:metrics-servlet:${metricsVersion}",
-            "com.codahale.metrics:metrics-servlets:${metricsVersion}",
-            "org.springframework.security:spring-security-web:${springSecurityVersion}",
+            "com.samskivert:jmustache:${jmustacheVersion}",
+            "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
             "org.apache.commons:commons-lang3:${commonsLang3Version}",
             "commons-io:commons-io:${commonsIoVersion}",
             "commons-codec:commons-codec:${commonsCodecVersion}",
             "org.apache.commons:commons-collections4:${commonsCollections4Version}",
             "com.squareup.okhttp:okhttp:${okhttpVersion}",
             "org.springframework.ws:spring-ws-core:${springWsVersion}",
-            "com.samskivert:jmustache:${jmustacheVersion}"
+            "org.springframework.boot:spring-boot-actuator:${springBootVersion}",
+            "com.codahale.metrics:metrics-jetty9:${metricsVersion}",
+            "com.codahale.metrics:metrics-servlet:${metricsVersion}",
+            "com.codahale.metrics:metrics-servlets:${metricsVersion}"
 
     testCompile "junit:junit:${junitVersion}",
             "org.hamcrest:hamcrest-library:${hamcrestVersion}",
             "org.mockito:mockito-core:${mockitoVersion}",
-            "org.springframework:spring-test:${springVersion}",
+            "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
             "com.squareup.okhttp:mockwebserver:${mockwebserverVersion}"
 
     integrationTestCompile "org.springframework.ws:spring-ws-test:${springWsVersion}"
