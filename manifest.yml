@@ -1,0 +1,6 @@
+---
+applications:
+- name: springmvc-jetty-spike
+  memory: 256M
+  instances: 1
+  domain: cfapps.io
