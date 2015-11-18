@@ -5,7 +5,7 @@ buildscript {
         maven { url 'http://repo.spring.io/libs-snapshot' }
     }
     dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.3.0.RC1'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.3.0.RELEASE'
         classpath 'org.unbroken-dome.gradle-plugins:gradle-testsets-plugin:1.2.0'
     }
 }
@@ -75,7 +75,7 @@ def commonsCollections4Version = '4.0'
 def commonsIoVersion = '2.4'
 def commonsLang3Version = '3.4'
 def hamcrestVersion = '1.3'
-def jettyVersion = '9.3.5.v20151012'
+def jettyVersion = '9.3.6.v20151106'
 def jmustacheVersion = '1.11'
 def junitVersion = '4.12'
 def metricsVersion = '3.0.2'
@@ -83,7 +83,7 @@ def mockitoVersion = '2.0.31-beta'
 def mockwebserverVersion = '2.5.0'
 def newRelicAgentVersion = '3.19.2'
 def okhttpVersion = '2.5.0'
-def springBootVersion = '1.3.0.RC1'
+def springBootVersion = '1.3.0.RELEASE'
 def springWsVersion = '2.2.3.RELEASE'
 
 dependencies {
