@@ -157,5 +157,5 @@ task stage(dependsOn: ['clean', 'copyNewRelic', 'assemble'],
 task wrapper(type: Wrapper,
         description: 'Create Gradle wrapper scripts.',
         group: 'Build Setup') {
-    gradleVersion = '2.9'
+    gradleVersion = '2.11'
 }
