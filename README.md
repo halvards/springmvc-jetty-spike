@@ -1,4 +1,4 @@
-# springmvc-jetty-spike [![Travis CI Build Status](https://travis-ci.org/halvards/springmvc-jetty-spike.svg?branch=master)](https://travis-ci.org/halvards/springmvc-jetty-spike) [![Circle CI Build Status](https://circleci.com/gh/halvards/springmvc-jetty-spike.svg?style=svg)](https://circleci.com/gh/halvards/springmvc-jetty-spike)
+# springmvc-jetty-spike [![Travis CI Build Status](https://travis-ci.org/halvards/springmvc-jetty-spike.svg?branch=master)](https://travis-ci.org/halvards/springmvc-jetty-spike) [![Circle CI Build Status](https://circleci.com/gh/halvards/springmvc-jetty-spike.svg?style=svg)](https://circleci.com/gh/halvards/springmvc-jetty-spike) [![Drone.io Build Status](https://drone.io/github.com/halvards/springmvc-jetty-spike/status.png)](https://drone.io/github.com/halvards/springmvc-jetty-spike/latest)
 
 Spike to work out what's required to run a Spring MVC application using embedded Jetty, where the application is configured only with code and annotations, no XML files.
 
