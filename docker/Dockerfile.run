@@ -1,0 +1,9 @@
+FROM java:8-jre-alpine
+
+VOLUME /app
+WORKDIR /app
+
+ENV PORT 8081
+EXPOSE 8081
+
+CMD ["java", "-jar", "springmvc-jetty-spike.jar"]

@@ -1,9 +1,9 @@
 package com.skogsrud.halvard.springmvc.spike.controller;
 
 import com.skogsrud.halvard.springmvc.spike.Application;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

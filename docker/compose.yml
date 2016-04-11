@@ -1,0 +1,21 @@
+run:
+  image: java:8-jre-alpine
+  container_name: springmvc-jetty-spike:run
+  volumes:
+    - "../build/libs:/app"
+  ports:
+    - "8081:8081"
+  working_dir: /app
+  command: java -jar springmvc-jetty-spike.jar
+
+dev:
+  build: .
+  container_name: springmvc-jetty-spike:dev
+  dockerfile: Dockerfile.dev
+  volumes:
+    - "..:/app"
+    - "$HOME/.gradle:/root/.gradle"
+  ports:
+    - "8081:8081"
+  working_dir: /app
+  command: gradle --no-daemon --stacktrace --info clean build

@@ -1,0 +1,14 @@
+FROM java:8-jdk-alpine
+
+ENV PATH $PATH:/usr/local/gradle/bin
+
+RUN apk add --no-cache curl bash && \
+    curl -sLO https://services.gradle.org/distributions/gradle-2.9-bin.zip && \
+    unzip -d /usr/local gradle-2.9-bin.zip && \
+    rm -f gradle-*.zip && \
+    ln -s gradle-2.9 /usr/local/gradle
+
+VOLUME /app
+WORKDIR /app
+
+CMD ["gradle", "--version"]
