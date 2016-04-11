@@ -1,12 +1,16 @@
 machine:
-  java:
-    version: oraclejdk8
+  services:
+    - docker
 dependencies:
   override:
-    - ./gradlew dependencies
+    - docker --version
+    - docker-compose --version
+    - ./go gradle compileTestJava
+  cache_directories:
+    - ~/.gradle
 test:
   override:
-    - ./gradlew check
+    - ./go build
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
