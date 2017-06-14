@@ -1,0 +1,25 @@
+version: 0.2
+
+env:
+  variables:
+    key: "value"
+
+phases:
+  install:
+    commands:
+      - echo Download dependencies...
+      - ./gradlew clean assemble
+  pre_build:
+    commands:
+  build:
+    commands:
+      - echo Build started on `date`
+      - ./gradlew check
+  post_build:
+    commands:
+      - echo Build completed on `date`
+artifacts:
+  files:
+    - 'libs/springmvc-jetty-spike.jar*'
+  discard-paths: yes
+  base-directory: build
